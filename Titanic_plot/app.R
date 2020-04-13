@@ -18,8 +18,8 @@ ui <- fluidPage(
             
             selectInput(inputId = "PassengerClass", label = "Enter Passenger Class",
                         choices = levels(Titanic$Class)
-                        )
-            
+                        ),
+            selectInput("Sex", "Choose sex", choices = c(levels(Titanic$Sex), "Both")   )
             
         ),
 
@@ -40,9 +40,14 @@ server <- function(input, output) {
         
               Titanic_subset <- Titanic %>% filter(Class == input$PassengerClass)
               
+              if (input$Sex == "Male") {Titanic_subset <- Titanic_subset %>% filter(Sex == "Male")}
+              if (input$Sex == "Female") {Titanic_subset <- Titanic_subset %>% filter(Sex == "Female")}
+              if (input$Sex == "Both") {Titanic_subset <- Titanic_subset}
+              
               ploteo <- ggplot(Titanic_subset, aes(x = Class, y = Freq, fill = Survived ) ) + 
-                               geom_bar(stat = "identity", position = position_dodge() 
-                              )
+                               geom_bar(stat = "identity", position = position_dodge() ) +
+                               ylab("Number of passengers")
+                              
               ploteo
                                 })
 

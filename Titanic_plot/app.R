@@ -25,7 +25,8 @@ ui <- fluidPage(
 
         # Show a plot of the generated distribution
         mainPanel(
-           plotOutput("Tit_plot")
+           plotOutput("Tit_plot"),
+           verbatimTextOutput("Nrpax")
         )
     )
 )
@@ -51,6 +52,21 @@ server <- function(input, output) {
               ploteo
                                 })
 
+    
+    output$Nrpax <- renderPrint({
+        
+        Titanic_subset <- Titanic %>% filter(Class == input$PassengerClass)
+        
+        if (input$Sex == "Male") {Titanic_subset <- Titanic_subset %>% filter(Sex == "Male")}
+        if (input$Sex == "Female") {Titanic_subset <- Titanic_subset %>% filter(Sex == "Female")}
+        if (input$Sex == "Both") {Titanic_subset <- Titanic_subset}
+        
+        print(paste0(c("Total # of passengers chosen =", Titanic_subset %>% summarise(sum(Freq)) )) )
+        
+        
+    })
+    
+    
  }
 
 # Run the application 

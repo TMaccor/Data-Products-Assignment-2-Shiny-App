@@ -1,6 +1,8 @@
 
 library(tidyverse)
 library(shiny)
+library(shinythemes)
+
 
 data("Titanic")
 Titanic <- as.data.frame(Titanic)
@@ -9,29 +11,41 @@ Titanic <- as.data.frame(Titanic)
 # Define UI for application that draws a histogram
 ui <- fluidPage(
 
+    theme = shinytheme("readable"),
+    
     # Application title
     titlePanel("Plotting Titanic survivors"),
 
-    # Sidebar with a slider input for number of bins 
+    # Sidebar with a sliders for Class and Sex 
     sidebarLayout(
         sidebarPanel(
             
-            selectInput(inputId = "PassengerClass", label = "Enter Passenger Class",
-                        choices = levels(Titanic$Class)
-                        ),
-            selectInput("Sex", "Choose sex", choices = c(levels(Titanic$Sex), "Both")   )
+            selectInput(inputId = "PassengerClass", label = "Enter passenger category",
+                        choices = c(levels(Titanic$Class), "All")  ),
+                        
+            selectInput("Sex", "Choose sex", choices = c(levels(Titanic$Sex), "Both")   ),
+            submitButton(text = "Show Plot")
             
-        ),
+                    ),
 
         # Show a plot of the generated distribution
         mainPanel(
-           plotOutput("Tit_plot"),
-           verbatimTextOutput("Nrpax")
-        )
+                tabsetPanel(type = "tabs", 
+                        tabPanel(icon = icon("bar-chart"),
+                                 title = "Plot",
+                                 plotOutput("Tit_plot"),
+                                 verbatimTextOutput("Nrpax") 
+                                ),
+                        
+                        tabPanel(icon = icon("newspaper-o"),
+                                 title = "Instructions",
+                                 mainPanel(includeMarkdown("Instructions.md"))
+                                 ) 
+                            )
+                     )
+                  ),
+
     )
-)
-
-
 ######################################################
 
 
@@ -39,7 +53,9 @@ server <- function(input, output) {
 
     output$Tit_plot <- renderPlot({
         
-              Titanic_subset <- Titanic %>% filter(Class == input$PassengerClass)
+              ifelse (input$PassengerClass =="All", Titanic_subset <- Titanic, 
+                     Titanic_subset <- Titanic %>% filter(Class == input$PassengerClass)
+                     )
               
               if (input$Sex == "Male") {Titanic_subset <- Titanic_subset %>% filter(Sex == "Male")}
               if (input$Sex == "Female") {Titanic_subset <- Titanic_subset %>% filter(Sex == "Female")}
@@ -55,7 +71,9 @@ server <- function(input, output) {
     
     output$Nrpax <- renderPrint({
         
-        Titanic_subset <- Titanic %>% filter(Class == input$PassengerClass)
+        ifelse (input$PassengerClass =="All", Titanic_subset <- Titanic, 
+                Titanic_subset <- Titanic %>% filter(Class == input$PassengerClass)
+        )
         
         if (input$Sex == "Male") {Titanic_subset <- Titanic_subset %>% filter(Sex == "Male")}
         if (input$Sex == "Female") {Titanic_subset <- Titanic_subset %>% filter(Sex == "Female")}

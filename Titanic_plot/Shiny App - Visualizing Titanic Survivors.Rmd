@@ -1,0 +1,177 @@
+---
+title: "The 'RMS Titanic' Survivors"
+author: "Tomás A. Maccor"
+date: "15/4/2020"
+output: 
+    slidy_presentation:
+    theme: readable
+---
+
+
+## App Overview
+
+This Shiny app enables the user to analyze fate of the **RMS Titanic's** passengers & crew.
+via exploratory plotting of the passenger survival data.   
+  
+The data used by the App comes from one of R's built in datasets  --Titanic.\  
+But it can very easily be modified to accept other dataset & plot them.\  
+\    
+It downloads the dataset & converts it to a dataframe so that it can be later passed on to the FILTER command from the DPLYR package
+
+
+```{r, echo=TRUE}
+library(shiny)
+library(shinythemes)
+library(dplyr, quietly = TRUE , warn.conflicts = FALSE)
+library(ggplot2, quietly = TRUE)
+library(readr, quietly = TRUE)
+
+data("Titanic")
+Titanic <- as.data.frame(Titanic)
+
+```
+
+The dataset has 5 variables and 32 observations:
+
+```{r, echo=FALSE}
+a <- Titanic
+knitr::kable(head(a), align = c("l") )
+```
+
+\break
+
+
+## App Layout
+
+
+* The App has a SIDEBAR Panel that has 2 sliders where the user will input the visualization choices
+* The user can choose the visualise all people that were onboard of the ship, OR by passenger category
+    + 1st class passengers
+    + 2nd class passengers
+    + 3rd class passengers
+    + ship's crew
+* PLUS the user can choose if they want to visualize either gender at one given time, or both
+\  
+* The MAIN Panel displays the plot of the user selection
+* It also displays the sum of the total # of passengers contained in the user selection
+
+\break
+
+## R code and Shiny commands used for the App
+
+The UI code accepts User Input via 2 "selectInput" Shiny commands:   
+* PassengerClass    
+* Sex
+
+```{r, echo=TRUE, eval=FALSE}
+selectInput(inputId = "PassengerClass", label = "Enter passenger category",
+                        choices = c(levels(Titanic$Class), "All")  ),
+                        
+            selectInput("Sex", "Choose sex", choices = c(levels(Titanic$Sex), "Both")   ),
+            submitButton(text = "Show Plot")
+```
+
+The Shiny SELECT boxes were improved in their functionality, so that they can also accept an input of ALL categories of the PASSENGER CLASS & SEX variables from the dataset.
+\  
+\  
+
+The algorithm in the **server.R** file used to subset the Titanic dataset (based on the user selection) is provided below:
+
+```{r, echo=TRUE, eval=FALSE}
+
+ifelse (input$PassengerClass =="All", Titanic_subset <- Titanic, 
+                     Titanic_subset <- Titanic %>% filter(Class == input$PassengerClass)
+                     )
+              
+              if (input$Sex == "Male") {Titanic_subset <- Titanic_subset %>% filter(Sex == "Male")}
+              if (input$Sex == "Female") {Titanic_subset <- Titanic_subset %>% filter(Sex == "Female")}
+              if (input$Sex == "Both") {Titanic_subset <- Titanic_subset}
+              
+              ploteo <- ggplot(Titanic_subset, aes(x = Class, y = Freq, fill = Survived ) ) + 
+                               geom_bar(stat = "identity", position = position_dodge() ) +
+                               ylab("Number of passengers")
+                              
+              ploteo
+
+
+```
+
+
+## Exploratory analysis
+
+By making exploratory plots, we can quickly obtain insights from this dataset.     
+    
+For example, the overall survival for 2nd Class passenger tells us that 1/3 of the passengers survived, but if we differentiate by sex we will see that the % of females that survived was roughly inversely proportional to the male survivors. Thus, we can confirm that the "women first" call was indeed observed for the 2nd Class passengers.      
+
+**ALL 2nd Class passengers**  
+*User input PASSENGERCLASS = "All"*   
+*User input SEX = "Both"*
+
+```{r, echo=FALSE, message=FALSE}
+
+inputPassenger <- "2nd"
+inputSex <- "All"
+
+ifelse (inputPassenger =="All", Titanic_subset <- Titanic, 
+       Titanic_subset <- filter(Titanic, Class == inputPassenger)
+       )
+       
+        if (inputSex == "Male") {Titanic_subset <- Titanic_subset %>% filter(Sex == "Male")}
+        if (inputSex == "Female") {Titanic_subset <- Titanic_subset %>% filter(Sex == "Female")}
+        if (inputSex == "Both") {Titanic_subset <- Titanic_subset}
+        
+        ploteo <- ggplot(Titanic_subset, aes(x = Class, y = Freq, fill = Survived ) ) + 
+            geom_bar(stat = "identity", position = position_dodge() ) +
+            ylab("Number of passengers")
+        
+        ploteo
+```
+
+**2nd Class FEMALE passengers**
+
+```{r, echo=FALSE, message=FALSE}
+inputPassenger <- "2nd"
+inputSex <- "Female"
+
+ifelse (inputPassenger =="All", Titanic_subset <- Titanic, 
+       Titanic_subset <- filter(Titanic, Class == inputPassenger)
+       )
+       
+        if (inputSex == "Male") {Titanic_subset <- Titanic_subset %>% filter(Sex == "Male")}
+        if (inputSex == "Female") {Titanic_subset <- Titanic_subset %>% filter(Sex == "Female")}
+        if (inputSex == "Both") {Titanic_subset <- Titanic_subset}
+        
+        ploteo <- ggplot(Titanic_subset, aes(x = Class, y = Freq, fill = Survived ) ) + 
+            geom_bar(stat = "identity", position = position_dodge() ) +
+            ylab("Number of passengers")
+        
+        ploteo
+
+
+
+```
+
+
+**2nd Class MALE passengers**
+
+```{r, echo=FALSE}
+inputPassenger <- "2nd"
+inputSex <- "Male"
+
+ifelse (inputPassenger =="All", Titanic_subset <- Titanic, 
+       Titanic_subset <- filter(Titanic, Class == inputPassenger)
+       )
+       
+        if (inputSex == "Male") {Titanic_subset <- Titanic_subset %>% filter(Sex == "Male")}
+        if (inputSex == "Female") {Titanic_subset <- Titanic_subset %>% filter(Sex == "Female")}
+        if (inputSex == "Both") {Titanic_subset <- Titanic_subset}
+        
+        ploteo <- ggplot(Titanic_subset, aes(x = Class, y = Freq, fill = Survived ) ) + 
+            geom_bar(stat = "identity", position = position_dodge() ) +
+            ylab("Number of passengers")
+        
+        ploteo
+
+
+
+```

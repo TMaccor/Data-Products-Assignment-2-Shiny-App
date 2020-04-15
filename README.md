@@ -14,8 +14,9 @@ This Shiny app allow users to visualise Titanic survival data at 2 different lev
      
 It is available at  https://thruinin.shinyapps.io/RMS_Titanic_Survivors/
 
-Its R source code is available on this GitHub repo.   
-Only 1 file "App.R" was created  (no separate ui.R and server.R files)   
+Its R source code is available on this GitHub repo --go to FILES folder.   
+Only 1 file "App.R" was created  (no separate ui.R and server.R files).
+App.R filename:  *app (with ALL CLASES Included).R*
    
 The pitch presentation made with RStudio Presenter explaining the app is avalilable here: http://rpubs.com/Thruinin/599753
 
